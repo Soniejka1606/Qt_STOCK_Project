@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from functools import partial
 
 # Form implementation generated from reading ui file 'add_tovar.ui'
 #
@@ -10,8 +11,14 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+import add_category
+import chose_category
+import config_dict
+
 
 class Ui_Dialog(object):
+    cat_t = []
+
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(1098, 876)
@@ -96,6 +103,9 @@ class Ui_Dialog(object):
         self.textEdit_4 = QtWidgets.QTextEdit(Dialog)
         self.textEdit_4.setGeometry(QtCore.QRect(200, 800, 141, 41))
         self.textEdit_4.setObjectName("textEdit_4")
+        self.textEdit_5 = QtWidgets.QTextEdit(Dialog)
+        self.textEdit_5.setGeometry(QtCore.QRect(550, 80, 200, 51))
+        self.textEdit_5.setObjectName("cat_name")
         self.label_6 = QtWidgets.QLabel(Dialog)
         self.label_6.setGeometry(QtCore.QRect(200, 770, 111, 20))
         font = QtGui.QFont()
@@ -123,9 +133,9 @@ class Ui_Dialog(object):
         font.setPointSize(12)
         self.pushButton_6.setFont(font)
         self.pushButton_6.setObjectName("pushButton_6")
-        self.textEdit_5 = QtWidgets.QTextEdit(Dialog)
-        self.textEdit_5.setGeometry(QtCore.QRect(560, 640, 251, 31))
-        self.textEdit_5.setObjectName("textEdit_5")
+        self.textEdit_6 = QtWidgets.QTextEdit(Dialog)
+        self.textEdit_6.setGeometry(QtCore.QRect(560, 640, 251, 31))
+        self.textEdit_6.setObjectName("textEdit_6")
         self.pushButton_7 = QtWidgets.QPushButton(Dialog)
         self.pushButton_7.setGeometry(QtCore.QRect(910, 760, 141, 41))
         font = QtGui.QFont()
@@ -154,10 +164,39 @@ class Ui_Dialog(object):
         self.label_8.setText(_translate("Dialog", "Картинка"))
         self.pushButton_6.setText(_translate("Dialog", "Отменить"))
         self.pushButton_7.setText(_translate("Dialog", "Применить"))
+        self.pushButton.clicked.connect(self.add_category)
+        self.pushButton_2.clicked.connect(self.chose_category)
+
+    def add_category(self):
+        Dialog = QtWidgets.QDialog()
+        ui1 = add_category.Ui_Dialog()
+        ui1.setupUi(Dialog)
+        Dialog.show()
+        Dialog.exec_()
+
+    def chose_category(self):
+        Dialog1 = QtWidgets.QDialog()
+        ui2 = chose_category.Ui_Dialog()
+        ui2.setupUi(Dialog1)
+        ui2.gen_tabl()
+        Dialog1.show()
+        Dialog1.exec_()
+        self.get_cat()
+
+    def get_cat(self):
+        try:
+            self.textEdit_5.setText(Ui_Dialog.cat_t[0])
+        except:
+            self.textEdit_5.setText('Категория не выбрана')
+
+    @classmethod
+    def change_cat(self):
+        Ui_Dialog.cat_t = config_dict.cat
 
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog()

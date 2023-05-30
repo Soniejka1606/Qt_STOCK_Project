@@ -1,7 +1,9 @@
 from functools import partial
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+import add_peremen
 import add_sclad
+import add_tovar
 
 
 # python -m PyQt5.uic.pyuic -x [FILENAME].ui -o [FILENAME].py
@@ -89,12 +91,30 @@ class Ui_MainWindow(object):
         self.pushButton_6.setText(_translate("MainWindow", "Добавить склад"))
         self.label.setText(_translate("MainWindow", "Добро пожаловать"))
         self.pushButton_6.clicked.connect(self.add_sklad)
+        self.pushButton.clicked.connect(self.add_tovar)
+        self.pushButton_3.clicked.connect(self.add_peremen)
+
 
     def add_sklad(self):
         Dialog = QtWidgets.QDialog()
         ui2 = add_sclad.Ui_Dialog()
         ui2.setupUi(Dialog)
         ui2.gen_tabl()
+        Dialog.show()
+        Dialog.exec_()
+
+    def add_tovar(self):
+        Dialog = QtWidgets.QDialog()
+        ui3 = add_tovar.Ui_Dialog()
+        ui3.setupUi(Dialog)
+        ui3.get_cat()
+        Dialog.show()
+        Dialog.exec_()
+
+    def add_peremen(self):
+        Dialog = QtWidgets.QDialog()
+        ui4 = add_peremen.Ui_Dialog()
+        ui4.setupUi(Dialog)
         Dialog.show()
         Dialog.exec_()
 
