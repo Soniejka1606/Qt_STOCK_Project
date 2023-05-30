@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from functools import partial
 
 # Form implementation generated from reading ui file 'add_category.ui'
 #
@@ -9,6 +10,9 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+
+import config_dict
+from basa import add_category
 
 
 class Ui_Dialog(object):
@@ -63,10 +67,19 @@ class Ui_Dialog(object):
         self.pushButton.setText(_translate("Dialog", "Добавить"))
         self.pushButton_2.setText(_translate("Dialog", "Отменить"))
         self.label_3.setText(_translate("Dialog", "Описание"))
+        self.pushButton.clicked.connect(partial(self.add_cat, Dialog))
+
+    def add_cat(self, Dialog):
+        name = self.textEdit.toPlainText()
+        disc = self.textEdit_2.toPlainText()
+        add_category(name, disc)
+        config_dict.cat = [name]
+        Dialog.close()
 
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog()

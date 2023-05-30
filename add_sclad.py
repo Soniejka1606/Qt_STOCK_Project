@@ -1,6 +1,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QTableWidgetItem
 
+from basa import registr_new_stock, show_stocks
+
 config = [[1, 'sklad1', 'adres1'], [2, 'sklad2', 'adres2'], [3, 'sklad3', 'adres3'], [4, 'sklad1', 'adres4'],
           [5, 'sklad2', 'adres5'], [6, 'sklad3', 'adres1']]
 
@@ -89,12 +91,13 @@ class Ui_Dialog(object):
     # генерирует таблицу
     def gen_tabl(self):
         try:
+            stoks = show_stocks()
             self.table_name = 'Существующие склады'
-            self.tableWidget.setColumnCount(len(config[0]))
-            self.tableWidget.setRowCount(len(config))
-            self.tableWidget.setHorizontalHeaderLabels(['id', 'name'])
+            self.tableWidget.setColumnCount(len(stoks[0]))
+            self.tableWidget.setRowCount(len(stoks))
+            self.tableWidget.setHorizontalHeaderLabels(['Название', 'Адрес'])
             row = 0
-            for tup in config:
+            for tup in stoks:
                 col = 0
                 for item in tup:
                     cell_info = QTableWidgetItem(str(item))
@@ -107,9 +110,9 @@ class Ui_Dialog(object):
     # Функция считывает введенное значение, затем записывает его в переменную обновляет таблицу,
     # стирает введенное значение
     def add_sclad(self):
-        get_val = getattr(self, 'textEdit')
-        get_val2 = getattr(self, 'textEdit2')
-        config.append([12134, get_val.toPlainText(), get_val2.toPlainText()])
+        name = self.textEdit.toPlainText()
+        address = self.textEdit2.toPlainText()
+        registr_new_stock(name, address)
         self.gen_tabl()
         self.textEdit.clear()
         self.textEdit2.clear()
@@ -119,11 +122,11 @@ class Ui_Dialog(object):
         item_ = self.tableWidget.item(row_, 0)
         item_ = item_.text()
         print(item_)
-        for i in config:
-            if int(item_) in i:
-                a = config.index(i)
-                config.pop(a)
-        print(config)
+        # for i in config:
+        #     if int(item_) in i:
+        #         a = config.index(i)
+        #         config.pop(a)
+        # print(config)
         self.gen_tabl()
 
     def clear_text(self):

@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import QTableWidgetItem
 import config_dict
 import Main
 import add_tovar
+from basa import show_category
 
 
 class Ui_Dialog(object):
@@ -57,15 +58,15 @@ class Ui_Dialog(object):
         self.pushButton.clicked.connect(partial(self.chose_cat, Dialog))
         self.pushButton_2.clicked.connect(partial(self.close_cat, Dialog))
 
-
     def gen_tabl(self):
         try:
+            categorys = show_category()
             self.table_name = 'Существующие склады'
-            self.tableWidget.setColumnCount(len(config_dict.category[0]))
-            self.tableWidget.setRowCount(len(config_dict.category))
-            self.tableWidget.setHorizontalHeaderLabels(['id', 'name', 'Описание'])
+            self.tableWidget.setColumnCount(len(categorys[0]))
+            self.tableWidget.setRowCount(len(categorys))
+            self.tableWidget.setHorizontalHeaderLabels(['Название', 'Описание'])
             row = 0
-            for tup in config_dict.category:
+            for tup in categorys:
                 col = 0
                 for item in tup:
                     cell_info = QTableWidgetItem(str(item))
@@ -75,20 +76,17 @@ class Ui_Dialog(object):
         except:
             pass
 
-    def chose_cat(self,Dialog):
+    def chose_cat(self, Dialog):
         row_ = self.tableWidget.currentRow()
-        item_ = self.tableWidget.item(row_, 1)
+        item_ = self.tableWidget.item(row_, 0)
         item_ = item_.text()
-        config_dict.cat.append(item_)
+        config_dict.cat = [item_]
         Dialog.close()
 
-
-
-
-
-    def close_cat(self,Dialog):
+    def close_cat(self, Dialog):
         config_dict.cat = []
         Dialog.close()
+
 
 if __name__ == "__main__":
     import sys

@@ -173,6 +173,7 @@ class Ui_Dialog(object):
         ui1.setupUi(Dialog)
         Dialog.show()
         Dialog.exec_()
+        self.get_cat()
 
     def chose_category(self):
         Dialog1 = QtWidgets.QDialog()
@@ -185,14 +186,13 @@ class Ui_Dialog(object):
 
     def get_cat(self):
         try:
-            self.textEdit_5.setText(Ui_Dialog.cat_t[0])
+            self.textEdit_5.setText(config_dict.cat[0])
         except:
             self.textEdit_5.setText('Категория не выбрана')
 
-    @classmethod
-    def change_cat(self):
-        Ui_Dialog.cat_t = config_dict.cat
-
+    # @classmethod
+    # def change_cat(self):
+    #     Ui_Dialog.cat_t = config_dict.cat
 
 if __name__ == "__main__":
     import sys

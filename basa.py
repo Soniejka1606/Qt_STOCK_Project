@@ -352,11 +352,11 @@ def show_category():
     '''
     try:
         with con:
-            data = con.execute(f"SELECT name FROM CategoryOfProduct")
+            data = con.execute(f"SELECT name, description FROM CategoryOfProduct")
             data = data.fetchall()
             list_cat = []
             for i in data:
-                list_cat.append(i[0])
+                list_cat.append([i[0], i[1]])
         return list_cat
     except Exception as e:
         print(e)
@@ -508,7 +508,7 @@ def show_stocks():
                                           ''')
         stock = stock.fetchall()
         for i in stock:
-            list_of_stock.append(f'{i[0]} , {i[1]}')
+            list_of_stock.append([i[0], i[1]])
         return list_of_stock
     except Exception as e:
         return e
