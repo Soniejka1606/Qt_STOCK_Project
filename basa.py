@@ -1,3 +1,4 @@
+import os
 import sqlite3 as sl
 from docxtpl import DocxTemplate
 from datetime import date
@@ -367,10 +368,11 @@ def show_products():
     param
     :return: список продуктов со всем нужным
     '''
+    products = []
     try:
         with con:
             data = con.execute(f'''SELECT Products.id,CategoryOfProduct.name,Products.name, 
-                                    Products.count,Stock.name,Products.articul,Products.characteristic
+                                    Products.count,Stock.name,Products.articul,Products.characteristic,Products.time_out
                                     FROM Products
                                     JOIN CategoryOfProduct ON
                                     Products.category_id = CategoryOfProduct.id
@@ -379,7 +381,9 @@ def show_products():
                                     WHERE Products.count>0
                                      ''')
             data = data.fetchall()
-        return data
+            for i in data:
+                products.append([i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7]])
+        return products
     except Exception as e:
         print(e)
 # print(show_products())
@@ -513,6 +517,32 @@ def show_stocks():
     except Exception as e:
         return e
 # print(show_stocks())
+
+def show_stocks_names_only():
+    '''
+    :return:  список со складами
+    '''
+    list_of_stock = []
+    try:
+        stock = con.execute(f'''SELECT name FROM Stock
+                                          ''')
+        stock = stock.fetchall()
+        for i in stock:
+            list_of_stock.append(i[0])
+        return list_of_stock
+    except Exception as e:
+        return e
+# print(show_stocks_names_only())
+
+def remove_stock(name):
+    try:
+        sql_insert =f"DELETE FROM Stock WHERE name='{name}'"
+        with con:
+            con.execute(sql_insert)
+    except Exception as e:
+        print(e)
+# print(remove_stock("fghgf"))
+
 
 def add_new_product(list_of_dict):
     '''
@@ -681,13 +711,22 @@ def accept_relocate(id_relocate):
                             (i["name"], i["category_id"], i["count"], i["characteristic"], i["stock_in"], i["articul"], i["time_out"]))
         except Exception as e:
             return print(e)
-# print(accept_relocate(19))
+    try:
+        # списываем товар
+        com = f"UPDATE Relocation SET is_done = ? WHERE Id = ?"
+        with con:
+            con.execute(com, (1, id_relocate))
+    except Exception as e:
+        print("Ошибка: ", e)
+
+# print(accept_relocate(24))
 
 def read_doc():
     '''
     попытки читать с документов
     :return:
     '''
+
     doc = Document('all_acts/Перемещение29.05.2023.docx')
     first_paragraph = doc.paragraphs[0]
     text = first_paragraph.text
@@ -702,3 +741,20 @@ def read_doc():
             value = cell.value
             print(value)
 # print(read_doc())
+
+
+def get_all_files():
+    a = os.listdir('docs_about_ordering')
+    print(a)
+
+get_all_files()
+def check_relocation_id(id):
+    try:
+        order_id = con.execute(f"SELECT * FROM Relocation WHERE id = {id} and is_done = 0")
+        order_id = order_id.fetchall()
+
+        return order_id
+    except:
+        return False
+
+print(check_relocation_id("24"))

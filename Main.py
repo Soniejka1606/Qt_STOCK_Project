@@ -1,12 +1,18 @@
 from functools import partial
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QFileDialog
 
 import add_peremen
 import add_sclad
 import add_tovar
+<<<<<<< HEAD
+=======
+import spisanie
+>>>>>>> 6b4ba3f (spisanie_perem_accept_pere)
 
 
 # python -m PyQt5.uic.pyuic -x [FILENAME].ui -o [FILENAME].py
+
 
 
 class Ui_MainWindow(object):
@@ -93,8 +99,20 @@ class Ui_MainWindow(object):
         self.pushButton_6.clicked.connect(self.add_sklad)
         self.pushButton.clicked.connect(self.add_tovar)
         self.pushButton_3.clicked.connect(self.add_peremen)
+<<<<<<< HEAD
 
+=======
+        self.pushButton_4.clicked.connect(self.add_spisanie)
+>>>>>>> 6b4ba3f (spisanie_perem_accept_pere)
 
+    def add_spisanie(self):
+        Dialog = QtWidgets.QDialog()
+        ui5 = spisanie.Ui_Dialog()
+        ui5.setupUi(Dialog)
+        ui5.gen_tabl()
+        ui5.gen_tabl2()
+        Dialog.show()
+        Dialog.exec_()
     def add_sklad(self):
         Dialog = QtWidgets.QDialog()
         ui2 = add_sclad.Ui_Dialog()
@@ -117,7 +135,15 @@ class Ui_MainWindow(object):
         ui4.setupUi(Dialog)
         Dialog.show()
         Dialog.exec_()
+<<<<<<< HEAD
 
+=======
+    def load_file(self):
+        print("функция на загрузку")
+        fname = QFileDialog.getOpenFileName(self,'open file','','All Files (*)')
+        if fname:
+            print(fname)
+>>>>>>> 6b4ba3f (spisanie_perem_accept_pere)
 
 if __name__ == "__main__":
     import sys

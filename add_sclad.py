@@ -1,7 +1,11 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QTableWidgetItem
 
+<<<<<<< HEAD
 from basa import registr_new_stock, show_stocks
+=======
+from basa import registr_new_stock, show_stocks, remove_stock
+>>>>>>> 6b4ba3f (spisanie_perem_accept_pere)
 
 config = [[1, 'sklad1', 'adres1'], [2, 'sklad2', 'adres2'], [3, 'sklad3', 'adres3'], [4, 'sklad1', 'adres4'],
           [5, 'sklad2', 'adres5'], [6, 'sklad3', 'adres1']]
@@ -122,11 +126,15 @@ class Ui_Dialog(object):
         item_ = self.tableWidget.item(row_, 0)
         item_ = item_.text()
         print(item_)
+<<<<<<< HEAD
         # for i in config:
         #     if int(item_) in i:
         #         a = config.index(i)
         #         config.pop(a)
         # print(config)
+=======
+        remove_stock(item_)
+>>>>>>> 6b4ba3f (spisanie_perem_accept_pere)
         self.gen_tabl()
 
     def clear_text(self):
