@@ -10,9 +10,11 @@ from functools import partial
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QFileDialog
 
 from basa import check_relocation_id, accept_relocate
-
+from docx import Document
+from openpyxl import load_workbook
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -54,6 +56,36 @@ class Ui_Dialog(object):
         self.pushButton_2.clicked.connect(partial(self.close_dialog, Dialog))
         # конец закрытия
         self.pushButton.clicked.connect(self.accept)
+        self.pushButton_3.clicked.connect(partial(self.load_file, Dialog))
+
+    def load_file(self, Dialog):
+        filters = "Word Documents (*.docx);;Excel Files (*.xlsx)"
+        fname = QFileDialog.getOpenFileName(Dialog, 'open file', 'reading_docs/', filters)
+        path = ''
+        spos = []
+        for k in fname:
+            spos.append(k)
+        print(spos[0])
+        path = spos[0]
+        try:
+            doc = Document(path)
+            #Ищем нужный склад
+            first_paragraph = doc.paragraphs[0]
+            text = first_paragraph.text
+            print(text)
+            text = text.split()[4]
+            self.lineEdit.setText(text)
+        except:
+            pass
+        try:
+            template_path = path
+            workbook = load_workbook(template_path)
+            sheet = workbook['Лист1']
+            text = sheet["C1"].value
+            print(f'------------{text}')
+            self.lineEdit.setText(str(text))
+        except:
+            pass
 
     def close_dialog(self, Dialog):
         Dialog.close()

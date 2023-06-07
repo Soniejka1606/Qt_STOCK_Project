@@ -193,6 +193,28 @@ def do_order(dict_): #для оформления заказа
 
 
 # print(do_order({"products":[["2","3","2"],["9","2","1"]],"sklad_end" : "1","user_id":"1"}))
+def find_stock(name):
+    try:
+        with con:
+            data = con.execute(f'''SELECT Id FROM Stock
+                                WHERE name = "{name}"''')
+            data = data.fetchall()
+            user_name = data[0][0]
+        return user_name
+    except Exception as e:
+        return e
+# print(find_stock("СКЛАД2"))
+def find_user(name):
+    try:
+        with con:
+            data = con.execute(f'''SELECT Id FROM Users
+                                WHERE name = "{name}"''')
+            data = data.fetchall()
+            user_name = data[0][0]
+        return user_name
+    except Exception as e:
+        return []
+print(find_user("Зайцева Яна Сергеевна"))
 
 
 def generate_doc_about_order(order_id): # не учитывая перемещения
@@ -266,13 +288,15 @@ def generate_doc_about_order(order_id): # не учитывая перемеще
     workbook.save(output_path)
     subprocess.call(['start', f'all_acts/Заказа{order_id}.xlsx'], shell=True)  # для открытия файла на просмотр
 
-# print(generate_doc_about_order(8))
+# print(generate_doc_about_order(12))
 def generate_doc_about_order_relocat(two_id): # учитывая перемещения
     '''
     генерируется документ что куда откуда надо быстренько привезди для заказа
     :param order_id: айди перемещения из прошлой функции (9, 12)
     :return:
     '''
+    if len(two_id)!=2:
+        return 0
     template = DocxTemplate('docs_about_ordering/шаблон1.docx')
     try:
         with con:
@@ -344,7 +368,7 @@ def generate_doc_about_order_relocat(two_id): # учитывая перемещ�
     output_path = f'all_acts/Перемещение_Заказа{two_id[0]}.xlsx'
     workbook.save(output_path)
     subprocess.call(['start', f'all_acts/Перемещение_Заказа{two_id[0]}.xlsx'], shell=True)  # для открытия файла на просмотр
-# print(generate_doc_about_order_relocat((10, 13)))
+# print(generate_doc_about_order_relocat((17, 18)))
 
 
 def show_category():
@@ -361,7 +385,7 @@ def show_category():
         return list_cat
     except Exception as e:
         print(e)
-# print(show_category())
+print(show_category())
 
 def show_products():
     '''
@@ -552,7 +576,7 @@ def add_new_product(list_of_dict):
     opis_adding =  []
     for i in list_of_dict:
         try:
-            sql_insert = f'''INSERT INTO Products (name,category_id,count,characteristic,stock_id,articul,time_out) values(?,?,?,?,?,?,?)'''
+            sql_insert = f'''INSERT INTO Products (name,category_id,count,characteristic,stock_id,articul,time_out,picture) values(?,?,?,?,?,?,?,?)'''
             cat_id = con.execute(f'''SELECT id FROM CategoryOfProduct WHERE name = "{i["category"]}"''')
             cat_id = cat_id.fetchall()
             cat_id = cat_id[0][0]
@@ -561,38 +585,38 @@ def add_new_product(list_of_dict):
             stock_id = stock_id[0][0]
             opis_adding.append({"name":i["name"],"count":i["count"],"sklad":i["sklad"],"category":i["category"]})
             with con:
-                con.execute(sql_insert, (i["name"],cat_id,i["count"],i["characteristic"],stock_id,i["articul"],i["time_out"]))
+                con.execute(sql_insert, (i["name"],cat_id,i["count"],i["characteristic"],stock_id,i["articul"],i["time_out"],i["picture"]))
         except Exception as e:
             return print(e)
-    #word
-    today = date.today()
-    format_today = today.strftime("%d.%m.%Y")
-    template = DocxTemplate('docs_about_ordering/шаблон_добавления.docx')
-    context = {
-        'date': format_today,
-        'orders': opis_adding}
-    # print(products)
-    template.render(context)  # вставляем в шаблон нужжные данные
-    peczat = 'docs_about_ordering/печать.png'  # пишем где находится печать
-    do_peczat = template.add_paragraph()  # добавляем абзац на добавлеине печати
-    do_peczat.add_run().add_picture(peczat, width=Inches(2))  # добавляем печать
-    template.save(f'all_acts/Добавлеине{format_today}.docx')  # сохраняем файл
-    subprocess.call(['start', f'all_acts/Добавлеине{format_today}.docx'], shell=True)  # для открытия файла на просмотр
-    # excel
-    template_path = 'docs_about_ordering/шаблон_добавления.xlsx'
-    workbook = load_workbook(template_path)
-    sheet = workbook['Лист1']
-    sheet['C2'] = format_today
-    row_index = 5
-    for item in opis_adding:
-        sheet.cell(row=row_index, column=1, value=item['name'])
-        sheet.cell(row=row_index, column=2, value=item['count'])
-        sheet.cell(row=row_index, column=3, value=item['sklad'])
-        sheet.cell(row=row_index, column=4, value=item['category'])
-        row_index += 1
-    output_path = f'all_acts/Добавление{format_today}.xlsx'
-    workbook.save(output_path)
-    subprocess.call(['start', f'all_acts/Добавление{format_today}.xlsx'], shell=True)  # для открытия файла на просмотр
+    # #word
+    # today = date.today()
+    # format_today = today.strftime("%d.%m.%Y")
+    # template = DocxTemplate('docs_about_ordering/шаблон_добавления.docx')
+    # context = {
+    #     'date': format_today,
+    #     'orders': opis_adding}
+    # # print(products)
+    # template.render(context)  # вставляем в шаблон нужжные данные
+    # peczat = 'docs_about_ordering/печать.png'  # пишем где находится печать
+    # do_peczat = template.add_paragraph()  # добавляем абзац на добавлеине печати
+    # do_peczat.add_run().add_picture(peczat, width=Inches(2))  # добавляем печать
+    # template.save(f'all_acts/Добавлеине{format_today}.docx')  # сохраняем файл
+    # subprocess.call(['start', f'all_acts/Добавлеине{format_today}.docx'], shell=True)  # для открытия файла на просмотр
+    # # excel
+    # template_path = 'docs_about_ordering/шаблон_добавления.xlsx'
+    # workbook = load_workbook(template_path)
+    # sheet = workbook['Лист1']
+    # sheet['C2'] = format_today
+    # row_index = 5
+    # for item in opis_adding:
+    #     sheet.cell(row=row_index, column=1, value=item['name'])
+    #     sheet.cell(row=row_index, column=2, value=item['count'])
+    #     sheet.cell(row=row_index, column=3, value=item['sklad'])
+    #     sheet.cell(row=row_index, column=4, value=item['category'])
+    #     row_index += 1
+    # output_path = f'all_acts/Добавление{format_today}.xlsx'
+    # workbook.save(output_path)
+    # subprocess.call(['start', f'all_acts/Добавление{format_today}.xlsx'], shell=True)  # для открытия файла на просмотр
 
 # print(add_new_product([{"name":"Кровать Будапешт","category":"Кровати","count":3,"characteristic":'что-то',"sklad":"СКЛАД2","articul":"BED3BUDAPESZT","time_out":"31.08.2025"}]))
 
@@ -730,16 +754,17 @@ def read_doc():
     doc = Document('all_acts/Перемещение29.05.2023.docx')
     first_paragraph = doc.paragraphs[0]
     text = first_paragraph.text
-    print(text)
-    template_path = 'all_acts/перемещение29.05.2023.xlsx'
+    # print(text)
+    # template_path = 'all_acts/перемещение29.05.2023.xlsx'
+    template_path ='D:/курсы python/задачки/Qt-sclad/reading_docs/подтверждение_перемещения29.05.2023.xlsx'
     workbook = load_workbook(template_path)
     sheet = workbook['Лист1']
     text = sheet["C1"].value
-    print(text)
-    for row in sheet.iter_rows(min_row=6, min_col=0):
-        for cell in row:
-            value = cell.value
-            print(value)
+    print(f'------------{text}')
+    # for row in sheet.iter_rows(min_row=6, min_col=0):
+    #     for cell in row:
+    #         value = cell.value
+    #         print(value)
 # print(read_doc())
 
 
@@ -747,7 +772,7 @@ def get_all_files():
     a = os.listdir('docs_about_ordering')
     print(a)
 
-get_all_files()
+# get_all_files()
 def check_relocation_id(id):
     try:
         order_id = con.execute(f"SELECT * FROM Relocation WHERE id = {id} and is_done = 0")
@@ -756,5 +781,22 @@ def check_relocation_id(id):
         return order_id
     except:
         return False
+# print(check_relocation_id("24"))
+def find_chatacteristic(id):
+    try:
+        order_id = con.execute(f"SELECT characteristic FROM Products WHERE id = {id}")
+        order_id = order_id.fetchall()
+        order_id = order_id[0][0]
+        return order_id
+    except:
+        return False
+print(find_chatacteristic(18))
 
-print(check_relocation_id("24"))
+def remove_user(id):
+    try:
+        sql_insert =f"DELETE FROM Users WHERE id='{id}'"
+        with con:
+            con.execute(sql_insert)
+    except Exception as e:
+        print(e)
+# print(remove_user("5"))

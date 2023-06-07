@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+import os
 from functools import partial
+
 
 # Form implementation generated from reading ui file 'add_tovar.ui'
 #
@@ -10,10 +12,17 @@ from functools import partial
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QTableWidgetItem, QFileDialog
+import datetime
+from docx.shared import Inches
+from docxtpl import DocxTemplate
+from openpyxl.reader.excel import load_workbook
 
 import add_category
 import chose_category
 import config_dict
+from basa import show_stocks, add_new_product
+from docx import Document
 
 
 class Ui_Dialog(object):
@@ -50,8 +59,12 @@ class Ui_Dialog(object):
         self.tableWidget = QtWidgets.QTableWidget(Dialog)
         self.tableWidget.setGeometry(QtCore.QRect(50, 170, 931, 421))
         self.tableWidget.setObjectName("tableWidget")
-        self.tableWidget.setColumnCount(0)
+        self.tableWidget.setColumnCount(8)
         self.tableWidget.setRowCount(0)
+        list_colums = ['         Название         ', 'Количество', '   Артикул   ', '     Категория     ',
+                       '  Склад  ', 'Срок годности', '         Описание         ', '       Фото       ']
+        self.tableWidget.setHorizontalHeaderLabels(list_colums)
+        self.tableWidget.resizeColumnsToContents()
         self.pushButton_4 = QtWidgets.QPushButton(Dialog)
         self.pushButton_4.setGeometry(QtCore.QRect(1010, 170, 61, 61))
         font = QtGui.QFont()
@@ -64,9 +77,9 @@ class Ui_Dialog(object):
         font.setPointSize(24)
         self.pushButton_5.setFont(font)
         self.pushButton_5.setObjectName("pushButton_5")
-        self.textEdit = QtWidgets.QTextEdit(Dialog)
-        self.textEdit.setGeometry(QtCore.QRect(50, 640, 291, 41))
-        self.textEdit.setObjectName("textEdit")
+        self.textEdit_1 = QtWidgets.QTextEdit(Dialog)
+        self.textEdit_1.setGeometry(QtCore.QRect(50, 640, 291, 41))
+        self.textEdit_1.setObjectName("name")
         self.label_2 = QtWidgets.QLabel(Dialog)
         self.label_2.setGeometry(QtCore.QRect(54, 610, 141, 20))
         font = QtGui.QFont()
@@ -75,7 +88,7 @@ class Ui_Dialog(object):
         self.label_2.setObjectName("label_2")
         self.textEdit_2 = QtWidgets.QTextEdit(Dialog)
         self.textEdit_2.setGeometry(QtCore.QRect(206, 720, 111, 41))
-        self.textEdit_2.setObjectName("textEdit_2")
+        self.textEdit_2.setObjectName("count")
         self.label_3 = QtWidgets.QLabel(Dialog)
         self.label_3.setGeometry(QtCore.QRect(210, 690, 111, 20))
         font = QtGui.QFont()
@@ -88,9 +101,11 @@ class Ui_Dialog(object):
         font.setPointSize(10)
         self.label_4.setFont(font)
         self.label_4.setObjectName("label_4")
-        self.fontComboBox = QtWidgets.QFontComboBox(Dialog)
-        self.fontComboBox.setGeometry(QtCore.QRect(366, 642, 181, 20))
-        self.fontComboBox.setObjectName("fontComboBox")
+        self.ComboBox = QtWidgets.QComboBox(Dialog)
+        self.ComboBox.setGeometry(QtCore.QRect(366, 642, 181, 20))
+        self.ComboBox.setObjectName("ComboBox")
+        list_stocks = list(stock[0] for stock in show_stocks())
+        self.ComboBox.addItems(list_stocks)
         self.label_5 = QtWidgets.QLabel(Dialog)
         self.label_5.setGeometry(QtCore.QRect(50, 690, 111, 20))
         font = QtGui.QFont()
@@ -99,19 +114,13 @@ class Ui_Dialog(object):
         self.label_5.setObjectName("label_5")
         self.textEdit_3 = QtWidgets.QTextEdit(Dialog)
         self.textEdit_3.setGeometry(QtCore.QRect(50, 720, 141, 41))
-        self.textEdit_3.setObjectName("textEdit_3")
+        self.textEdit_3.setObjectName("articul")
         self.textEdit_4 = QtWidgets.QTextEdit(Dialog)
-        self.textEdit_4.setGeometry(QtCore.QRect(200, 800, 141, 41))
-        self.textEdit_4.setObjectName("textEdit_4")
+        self.textEdit_4.setGeometry(QtCore.QRect(550, 80, 200, 51))
+        self.textEdit_4.setObjectName("cat_name")
         self.textEdit_5 = QtWidgets.QTextEdit(Dialog)
-        self.textEdit_5.setGeometry(QtCore.QRect(550, 80, 200, 51))
-        self.textEdit_5.setObjectName("cat_name")
-        self.label_6 = QtWidgets.QLabel(Dialog)
-        self.label_6.setGeometry(QtCore.QRect(200, 770, 111, 20))
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.label_6.setFont(font)
-        self.label_6.setObjectName("label_6")
+        self.textEdit_5.setGeometry(QtCore.QRect(560, 700, 250, 150))
+        self.textEdit_5.setObjectName("descr")
         self.label_7 = QtWidgets.QLabel(Dialog)
         self.label_7.setGeometry(QtCore.QRect(50, 770, 111, 20))
         font = QtGui.QFont()
@@ -119,11 +128,17 @@ class Ui_Dialog(object):
         self.label_7.setFont(font)
         self.label_7.setObjectName("label_7")
         self.label_8 = QtWidgets.QLabel(Dialog)
-        self.label_8.setGeometry(QtCore.QRect(564, 600, 111, 20))
+        self.label_8.setGeometry(QtCore.QRect(564, 610, 111, 20))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.label_8.setFont(font)
         self.label_8.setObjectName("label_8")
+        self.label_9 = QtWidgets.QLabel(Dialog)
+        self.label_9.setGeometry(QtCore.QRect(564, 680, 111, 20))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.label_9.setFont(font)
+        self.label_9.setObjectName("label_9")
         self.dateEdit = QtWidgets.QDateEdit(Dialog)
         self.dateEdit.setGeometry(QtCore.QRect(50, 800, 110, 22))
         self.dateEdit.setObjectName("dateEdit")
@@ -135,13 +150,20 @@ class Ui_Dialog(object):
         self.pushButton_6.setObjectName("pushButton_6")
         self.textEdit_6 = QtWidgets.QTextEdit(Dialog)
         self.textEdit_6.setGeometry(QtCore.QRect(560, 640, 251, 31))
-        self.textEdit_6.setObjectName("textEdit_6")
+        self.textEdit_6.setObjectName("img")
         self.pushButton_7 = QtWidgets.QPushButton(Dialog)
         self.pushButton_7.setGeometry(QtCore.QRect(910, 760, 141, 41))
         font = QtGui.QFont()
         font.setPointSize(12)
         self.pushButton_7.setFont(font)
         self.pushButton_7.setObjectName("pushButton_7")
+        self.pushButton_8 = QtWidgets.QPushButton(Dialog)
+        self.pushButton_8.setGeometry(QtCore.QRect(700, 600, 110, 30))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.pushButton_8.setFont(font)
+        self.pushButton_8.setObjectName("pushButton_8")
+        self.get_cat()
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -159,13 +181,102 @@ class Ui_Dialog(object):
         self.label_3.setText(_translate("Dialog", "Количество"))
         self.label_4.setText(_translate("Dialog", "Склад"))
         self.label_5.setText(_translate("Dialog", "Артикул"))
-        self.label_6.setText(_translate("Dialog", "Стоимость"))
         self.label_7.setText(_translate("Dialog", "Срок годности"))
         self.label_8.setText(_translate("Dialog", "Картинка"))
+        self.label_9.setText(_translate("Dialog", "Описание"))
         self.pushButton_6.setText(_translate("Dialog", "Отменить"))
         self.pushButton_7.setText(_translate("Dialog", "Применить"))
+        self.pushButton_8.setText(_translate("Dialog", "Добавить"))
         self.pushButton.clicked.connect(self.add_category)
         self.pushButton_2.clicked.connect(self.chose_category)
+        self.pushButton_4.clicked.connect(self.add_product)
+        self.pushButton_5.clicked.connect(self.del_product)
+        self.pushButton_6.clicked.connect(self.tabl_clear)
+        self.pushButton_7.clicked.connect(self.save_product)
+        self.pushButton_8.clicked.connect(partial(self.add_img, Dialog))
+        self.pushButton_3.clicked.connect(partial(self.load_file, Dialog))
+
+    # print(relocate([{"id":17,"name":"Кровать Будапешт","category":"Кровати","count":3,
+    # "characteristic":'что-то',"sklad":"СКЛАД2","articul":"BED3BUDAPESZT","time_out":"31.08.2025"}],"СКЛАД3","переметить"))
+
+    def add_product(self):
+        list_item = []
+        for i in range(1, 7):
+            if eval(f'self.textEdit_{str(i)}').toPlainText() == '':
+                list_item.append('Не выбрано')
+            else:
+                list_item.append(eval(f'self.textEdit_{str(i)}').toPlainText())
+        list_item.insert(4, self.ComboBox.currentText())
+        list_item.insert(5, self.dateEdit.date().toString('dd-MM-yyyy'))
+        print(list_item)
+        count_row = self.tableWidget.rowCount()
+        self.tableWidget.insertRow(count_row)
+        print(count_row)
+        for colum in range(8):
+            self.tableWidget.setItem(count_row, colum, QTableWidgetItem(list_item[colum]))
+
+    def del_product(self):
+        row = self.tableWidget.currentRow()
+        self.tableWidget.removeRow(row)
+
+    def tabl_clear(self):
+        count_row = self.tableWidget.rowCount()
+        for i in range(count_row):
+            self.tableWidget.removeRow(0)
+
+    def add_img(self, Dialog):
+        try:
+            filters = "Image (*.jpg);; PNG (*.png)"
+            fname = QFileDialog.getOpenFileName(Dialog, 'open file', filter=filters)
+            print(fname[0])
+            img_file = ''
+            with open(str(fname[0]), 'rb') as file:
+                img_file = file.read()
+            with open(f'img/{str(fname[0]).split("/")[-1]}', "wb") as file:
+                file.write(img_file)
+            self.textEdit_6.setText(str(fname[0]).split("/")[-1])
+        except:
+            self.textEdit_6.setText('не выбрано')
+
+    def save_product(self):
+        list_colum = ["name", "count", "articul", "category", "sklad", "time_out", "characteristic", "picture"]
+        count_row = self.tableWidget.rowCount()
+        list_products = []
+        for row in range(count_row):
+            dict_product = {}
+            for colum in range(8):
+                item_ = self.tableWidget.item(row, colum).text()
+                dict_product[list_colum[colum]] = item_
+            list_products.append(dict_product)
+        self.tabl_clear()
+        format_today = datetime.datetime.now()
+        format_today = format_today.strftime("%d-%m-%Y-%H-%M")
+        template = DocxTemplate('docs_about_ordering/шаблон__приемки товаров.docx')
+        context = {
+            'date': format_today,
+            'orders': list_products}
+        template.render(context)  # вставляем в шаблон нужжные данные
+        peczat = 'docs_about_ordering/печать.png'  # пишем где находится печать
+        do_peczat = template.add_paragraph()  # добавляем абзац на добавлеине печати
+        do_peczat.add_run().add_picture(peczat, width=Inches(2))  # добавляем печать
+        template.save(f'all_acts/Добавление товара_{format_today}.docx')  # сохраняем файл
+        os.startfile(f'all_acts\Добавление товара_{format_today}.docx')
+        # excel
+        workbook = load_workbook('docs_about_ordering/шаблон_добавления товаров.xlsx')
+        sheet = workbook['Лист1']
+        sheet['C2'] = format_today
+        row_index = 5
+        for item in list_products:
+            sheet.cell(row=row_index, column=1, value=item["name"])
+            sheet.cell(row=row_index, column=2, value=int(item["count"]))
+            sheet.cell(row=row_index, column=3, value=item["sklad"])
+            row_index += 1
+        sheet.cell(row=row_index, column=1, value='ВСЕГО')
+        sheet.cell(row=row_index, column=2, value='')
+        sheet.cell(row=row_index, column=3, value=f'=СУММ(B5:B{row_index-1})')
+        workbook.save(f'all_acts/Добавление товара{format_today}.xlsx')
+        os.startfile(f'all_acts\Добавление товара{format_today}.xlsx')
+        add_new_product(list_products)
 
     def add_category(self):
         Dialog = QtWidgets.QDialog()
@@ -182,17 +293,54 @@ class Ui_Dialog(object):
         ui2.gen_tabl()
         Dialog1.show()
         Dialog1.exec_()
+        print(config_dict.cat[0])
         self.get_cat()
 
     def get_cat(self):
         try:
-            self.textEdit_5.setText(config_dict.cat[0])
+            self.textEdit_4.setText(config_dict.cat[0])
         except:
-            self.textEdit_5.setText('Категория не выбрана')
+            self.textEdit_4.setText('Категория не выбрана')
 
-    # @classmethod
-    # def change_cat(self):
-    #     Ui_Dialog.cat_t = config_dict.cat
+    def gen_tabl(self, products):
+        try:
+            self.tableWidget.setColumnCount(len(products[0]))
+            self.tableWidget.setRowCount(len(products))
+            row = 0
+            for tup in products:
+                col = 0
+                for item in tup:
+                    cell_info = QTableWidgetItem(str(item))
+                    self.tableWidget.setItem(row, col, cell_info)
+                    col += 1
+                row += 1
+                self.tableWidget.resizeColumnsToContents()
+        except:
+            pass
+
+
+    def load_file(self, Dialog):
+        filters = "Word Documents (*.docx);;Excel Files (*.xlsx)"
+        fname = QFileDialog.getOpenFileName(Dialog, 'open file', 'reading_docs/', filters)
+        path = f'{fname[0]}'
+        list_of_products = []
+        try:
+            doc = Document(path)
+            tables = doc.tables
+            table = tables[0]
+            print(table)
+            for row in table.rows[1:]:
+                a = []
+                for cell in row.cells[1:]:
+                    cell_text = cell.text
+                    print(cell_text)
+                    a.append(str(cell_text))
+                list_of_products.append(a)
+            print(list_of_products)
+            self.gen_tabl(list_of_products)
+        except:
+            pass
+
 
 if __name__ == "__main__":
     import sys

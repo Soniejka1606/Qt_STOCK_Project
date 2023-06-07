@@ -2,17 +2,23 @@ from functools import partial
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog
 
-import add_peremen
+import accept_relocation
 import add_sclad
 import add_tovar
-<<<<<<< HEAD
-=======
+import do_order
+import relocation
 import spisanie
->>>>>>> 6b4ba3f (spisanie_perem_accept_pere)
+
+
+#
+# import add_peremen
+# import add_sclad
+# import add_tovar
+#
+# import spisanie
 
 
 # python -m PyQt5.uic.pyuic -x [FILENAME].ui -o [FILENAME].py
-
 
 
 class Ui_MainWindow(object):
@@ -99,13 +105,11 @@ class Ui_MainWindow(object):
         self.pushButton_6.clicked.connect(self.add_sklad)
         self.pushButton.clicked.connect(self.add_tovar)
         self.pushButton_3.clicked.connect(self.add_peremen)
-<<<<<<< HEAD
+        self.pushButton_5.clicked.connect(self.accept_relocation)
+        self.pushButton_2.clicked.connect(self.do_order)
+        self.pushButton_4.clicked.connect(self.spisanie)
 
-=======
-        self.pushButton_4.clicked.connect(self.add_spisanie)
->>>>>>> 6b4ba3f (spisanie_perem_accept_pere)
-
-    def add_spisanie(self):
+    def spisanie(self):
         Dialog = QtWidgets.QDialog()
         ui5 = spisanie.Ui_Dialog()
         ui5.setupUi(Dialog)
@@ -113,6 +117,7 @@ class Ui_MainWindow(object):
         ui5.gen_tabl2()
         Dialog.show()
         Dialog.exec_()
+
     def add_sklad(self):
         Dialog = QtWidgets.QDialog()
         ui2 = add_sclad.Ui_Dialog()
@@ -131,19 +136,29 @@ class Ui_MainWindow(object):
 
     def add_peremen(self):
         Dialog = QtWidgets.QDialog()
-        ui4 = add_peremen.Ui_Dialog()
+        ui4 = relocation.Ui_Dialog()
         ui4.setupUi(Dialog)
+        ui4.gen_tabl()
+        ui4.gen_tabl2()
         Dialog.show()
         Dialog.exec_()
-<<<<<<< HEAD
 
-=======
-    def load_file(self):
-        print("функция на загрузку")
-        fname = QFileDialog.getOpenFileName(self,'open file','','All Files (*)')
-        if fname:
-            print(fname)
->>>>>>> 6b4ba3f (spisanie_perem_accept_pere)
+    def accept_relocation(self):
+        Dialog = QtWidgets.QDialog()
+        ui5 = accept_relocation.Ui_Dialog()
+        ui5.setupUi(Dialog)
+        Dialog.show()
+        Dialog.exec_()
+
+    def do_order(self):
+        Dialog = QtWidgets.QDialog()
+        ui6 = do_order.Ui_Dialog()
+        ui6.setupUi(Dialog)
+        ui6.gen_tabl()
+        ui6.gen_tabl2()
+        Dialog.show()
+        Dialog.exec_()
+
 
 if __name__ == "__main__":
     import sys
